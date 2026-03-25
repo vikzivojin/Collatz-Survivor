@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#0f0f1a"/>
+  <rect width="64" height="64" rx="14" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+  <!-- C arc: sweeps around, gap faces right, endpoints at ~40deg above/below horizontal -->
+  <path d="M46 18 a22 22 0 1 0 0 28" fill="none" stroke="#4d8fff" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Dot at the midpoint of the gap — directly right of center, on the arc -->
+  <circle cx="50" cy="32" r="4.5" fill="#ff5a4e"/>
+</svg>

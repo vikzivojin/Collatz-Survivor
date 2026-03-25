@@ -1,0 +1,465 @@
+.game {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+}
+
+/* ── Stats row ──────────────────────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: box-shadow 0.4s;
+}
+
+.stat-card--glow {
+  box-shadow: 0 0 0 2px var(--success), var(--shadow);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+.stat-val {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-val--cheat { color: var(--cheat); }
+.stat-val--best  { color: var(--accent); }
+
+/* ── Recharge banner ────────────────────────────────────── */
+.recharge-banner {
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 40%, transparent);
+  color: var(--success);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: center;
+  animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Play area ──────────────────────────────────────────── */
+.play-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Current number card ────────────────────────────────── */
+.current-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  /* Stable width: enough for "100,000,000,000" at max font size, grows if needed */
+  min-width: min(100%, 560px);
+}
+
+.current-num {
+  font-family: var(--font-mono);
+  font-size: clamp(3.5rem, 10vw, 5.4rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  transition: color 0.2s;
+  /* Reserve space for up to 100B (15 chars) at current font — prevents layout shift */
+  min-width: 15ch;
+  text-align: center;
+  display: block;
+}
+
+.current-num--even { color: var(--normal); }
+.current-num--odd  { color: var(--text); }
+
+/* Normal fade: clean opacity fade */
+@keyframes fade-normal {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Cheat fade: glow pulse effect */
+@keyframes fade-cheat {
+  0%   { opacity: 0; transform: scale(0.92); filter: brightness(2); }
+  60%  { opacity: 1; transform: scale(1.04); filter: brightness(1.3); }
+  100% { opacity: 1; transform: scale(1);    filter: brightness(1); }
+}
+
+.fade-in-normal {
+  animation: fade-normal 0.3s ease forwards;
+}
+
+.fade-in-cheat {
+  animation: fade-cheat 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Cheat counter animation */
+@keyframes cheat-used {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.4); color: var(--warn); }
+  60%  { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
+
+.cheat-anim {
+  animation: cheat-used 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Action row ─────────────────────────────────────────── */
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.action-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+
+.action-card--danger {
+  border-color: var(--cheat);
+  background: var(--cheat-soft);
+}
+
+.action-card--locked {
+  opacity: 0.42;
+}
+
+.action-op {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.action-result {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 28px;
+}
+
+.action-result--danger { color: var(--cheat); }
+
+.locked-text {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.repeat-pill {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  background: var(--cheat);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 20px;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.75; transform: scale(0.97); }
+  to   { opacity: 1;    transform: scale(1.02); }
+}
+
+/* ── Game buttons ───────────────────────────────────────── */
+.game-btn {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 3px;
+  padding: 1px 5px;
+  line-height: 1.4;
+}
+
+.game-btn--normal {
+  background: var(--normal);
+  color: #fff;
+  border-color: var(--normal);
+}
+.game-btn--normal:hover {
+  opacity: 0.85;
+}
+
+.game-btn--cheat {
+  background: var(--cheat);
+  color: #fff;
+  border-color: var(--cheat);
+}
+.game-btn--cheat:hover:not(:disabled) {
+  opacity: 0.85;
+}
+.game-btn--cheat:disabled {
+  background: var(--bg2);
+  border-color: var(--border);
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+
+/* ── Live chart ─────────────────────────────────────────── */
+.live-chart-toggle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: left;
+  transition: color var(--transition);
+  align-self: flex-start;
+}
+.live-chart-toggle:hover,
+.live-chart-toggle--active { color: var(--accent); }
+
+.live-chart-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  animation: pop-in 0.2s ease;
+}
+
+/* ── Share button ────────────────────────────────────────── */
+.game-btn--share {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border-strong);
+}
+.game-btn--share:hover {
+  background: var(--bg2);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.gameover-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.game-btn--chart {
+  background: var(--surface2, var(--bg2));
+  color: var(--text);
+  border-color: var(--border-strong);
+  padding: 10px 20px;
+}
+.game-btn--chart:hover {
+  background: var(--bg2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.game-btn--restart {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+  padding: 12px 28px;
+  font-size: 0.9rem;
+  width: auto;
+  margin-top: 8px;
+}
+.game-btn--restart:hover { opacity: 0.85; }
+
+/* ── Keyboard hint ──────────────────────────────────────── */
+.kbd-hint {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.kbd-hint kbd {
+  background: var(--bg2);
+  border-color: var(--border);
+  color: var(--text-muted);
+  font-size: 0.62rem;
+}
+
+/* ── Game Over ──────────────────────────────────────────── */
+.gameover-award {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--warn) 20%, transparent), color-mix(in srgb, var(--accent) 15%, transparent));
+  border: 1px solid color-mix(in srgb, var(--warn) 50%, transparent);
+  color: var(--warn);
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gameover-card {
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gameover-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.gameover-badge--new {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 15%, transparent);
+  border-color: color-mix(in srgb, var(--warn) 40%, transparent);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+.gameover-score {
+  font-family: var(--font-mono);
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.04em;
+}
+
+.gameover-sub {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-top: -6px;
+  text-transform: uppercase;
+}
+
+.gameover-repeat {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cheat);
+  background: var(--cheat-soft);
+  border: 1px solid color-mix(in srgb, var(--cheat) 30%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  text-align: center;
+}
+
+.gameover-repeat--special {
+  border-color: color-mix(in srgb, var(--warn) 50%, transparent);
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+}
+
+.gameover-hs {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.gameover-cheats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.gameover-cheats-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.cheat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.cheat-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--cheat-soft);
+  color: var(--cheat);
+  border: 1px solid color-mix(in srgb, var(--cheat) 30%, transparent);
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+@media (max-width: 520px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .action-row { grid-template-columns: 1fr; }
+}
