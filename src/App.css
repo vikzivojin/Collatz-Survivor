@@ -616,3 +616,215 @@ html, body {
   border-color: var(--border);
 }
 .btn--ghost:hover { background: var(--bg2); color: var(--text); border-color: var(--border-strong); }
+
+/* ── Hamburger button ───────────────────────────────────── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  gap: 5px;
+  padding: 0;
+  transition: border-color var(--transition);
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { border-color: var(--border-strong); }
+
+.hamburger-bar {
+  display: block;
+  position: relative;
+  width: 16px;
+  height: 10px;
+}
+.hamburger-bar::before,
+.hamburger-bar::after,
+.hamburger-bar span {
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+/* Three lines via pseudo-elements + a real span isn't clean — use box-shadow trick */
+.hamburger-bar {
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  box-shadow: 0 5px 0 var(--text-muted), 0 10px 0 var(--text-muted);
+  transition: all 0.2s ease;
+}
+.hamburger-bar--open {
+  background: transparent;
+  box-shadow: none;
+}
+.hamburger-bar--open::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+.hamburger-bar--open::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  transform: rotate(-45deg);
+}
+
+/* ── Mobile drawer menu ─────────────────────────────────── */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 58px 0 0 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 49;
+  animation: fade-in 0.15s ease;
+}
+
+.mobile-menu-inner {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-link {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.mobile-menu-link:hover { background: var(--bg2); color: var(--text); }
+.mobile-menu-link--active { color: var(--accent); }
+
+.mobile-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 20px;
+}
+
+/* ── Desktop sidebar — hidden on mobile ─────────────────── */
+.sequence-sidebar--desktop {
+  width: 200px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Mobile sequence toggle ─────────────────────────────── */
+.sequence-mobile { display: none; }
+
+.sequence-mobile-toggle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.sequence-mobile-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.sequence-mobile-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55vh;
+  background: var(--surface);
+  border-top: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
+  animation: slide-up 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sequence-mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sequence-mobile-close {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg2);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.sequence-mobile-close:hover { background: var(--border); color: var(--text); }
+
+/* ── Responsive breakpoint ──────────────────────────────── */
+@media (max-width: 700px) {
+  /* Show hamburger, hide desktop nav links and date button */
+  .nav-hamburger { display: flex; }
+  .nav-links--desktop { display: none; }
+  .nav-date-btn { display: none; }
+  .mobile-menu { display: block; }
+
+  /* Hide desktop sidebar, show mobile toggle */
+  .sequence-sidebar--desktop { display: none; }
+  .sequence-mobile { display: flex; justify-content: center; padding: 8px 0 4px; }
+
+  /* Hide daily info panel (too cramped) */
+  .daily-info-panel { display: none; }
+
+  /* Tighten main area padding */
+  .app-main { padding: 16px 12px; }
+
+  /* App body must allow scrolling on mobile */
+  .app-body { overflow-y: auto; }
+  .app { height: 100dvh; }
+}
+

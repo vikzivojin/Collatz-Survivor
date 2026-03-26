@@ -459,7 +459,20 @@ kbd {
   border-radius: 4px;
 }
 
-@media (max-width: 520px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .action-row { grid-template-columns: 1fr; }
+@media (max-width: 700px) {
+  .game { gap: 14px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .action-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .current-card { padding: 20px 16px; }
+  .current-num { font-size: clamp(2.6rem, 12vw, 3.6rem); min-width: unset; }
+  .kbd-hint { display: none; }
+  .gameover-card { padding: 24px 16px; }
+  .gameover-score { font-size: 3.5rem; }
+  .gameover-actions { flex-direction: column; align-items: stretch; }
+  .gameover-actions .game-btn { width: 100%; justify-content: center; }
+  .game-btn--restart { width: 100%; margin-top: 0; padding: 12px; }
+  .live-chart-panel { margin-top: 0; }
+  .action-card { padding: 14px 10px; gap: 8px; }
+  .stat-card { padding: 10px 8px; }
+  .stat-val { font-size: 1.2rem; }
 }

@@ -18,6 +18,7 @@ function AppInner() {
   const [modal, setModal] = useState(null); // 'rules' | 'stats' | null
   const [activePage, setActivePage] = useState('play'); // 'play' | 'negative' | 'privacy' | 'contact'
   const [showSplash, setShowSplash] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const { startingNumber, initialCheats, rechargeInterval } = getDailyParams(selectedDate);
 
@@ -67,47 +68,73 @@ function AppInner() {
     <div className="app">
       {/* ── Navigation ── */}
       <nav className="nav">
-        <button className="nav-logo" onClick={() => setShowSplash(true)}>
+        <button className="nav-logo" onClick={() => { setShowSplash(true); setMenuOpen(false); }}>
           Collatz <span>Survivor</span>
         </button>
 
-        <div className="nav-links">
+        {/* Desktop links */}
+        <div className="nav-links nav-links--desktop">
           <button
             className={`nav-link ${activePage === 'play' ? 'nav-link--active' : ''}`}
             onClick={() => setActivePage('play')}
           >
             Play
           </button>
-          <button
-            className="nav-link"
-            onClick={() => setModal('rules')}
-          >
-            Rules
-          </button>
+          <button className="nav-link" onClick={() => setModal('rules')}>Rules</button>
           <button
             className={`nav-link ${activePage === 'negative' ? 'nav-link--active' : ''}`}
             onClick={() => setActivePage('negative')}
           >
             Negative Collatz
           </button>
-          <button
-            className="nav-link"
-            onClick={() => setModal('stats')}
-          >
-            Statistics
-          </button>
+          <button className="nav-link" onClick={() => setModal('stats')}>Statistics</button>
         </div>
 
         <div className="nav-right">
-          <button
-            className="nav-date-btn"
-            onClick={() => setShowDatePicker(v => !v)}
-          >
+          <button className="nav-date-btn" onClick={() => setShowDatePicker(v => !v)}>
             📅 {formatDate(selectedDate)}
           </button>
           <ThemeDropdown />
+          {/* Hamburger */}
+          <button
+            className="nav-hamburger"
+            onClick={() => setMenuOpen(v => !v)}
+            aria-label="Menu"
+          >
+            <span className={`hamburger-bar ${menuOpen ? 'hamburger-bar--open' : ''}`} />
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu drawer */}
+      {menuOpen && (
+        <div className="mobile-menu" onClick={() => setMenuOpen(false)}>
+          <div className="mobile-menu-inner" onClick={e => e.stopPropagation()}>
+            <button
+              className={`mobile-menu-link ${activePage === 'play' ? 'mobile-menu-link--active' : ''}`}
+              onClick={() => { setActivePage('play'); setMenuOpen(false); }}
+            >
+              Play
+            </button>
+            <button className="mobile-menu-link" onClick={() => { setModal('rules'); setMenuOpen(false); }}>
+              Rules
+            </button>
+            <button
+              className={`mobile-menu-link ${activePage === 'negative' ? 'mobile-menu-link--active' : ''}`}
+              onClick={() => { setActivePage('negative'); setMenuOpen(false); }}
+            >
+              Negative Collatz
+            </button>
+            <button className="mobile-menu-link" onClick={() => { setModal('stats'); setMenuOpen(false); }}>
+              Statistics
+            </button>
+            <div className="mobile-menu-divider" />
+            <button className="mobile-menu-link" onClick={() => { setShowDatePicker(v => !v); setMenuOpen(false); }}>
+              📅 {formatDate(selectedDate)}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Date Picker ── */}
       {showDatePicker && (
@@ -215,6 +242,7 @@ const THEME_COLORS = {
 function SequenceSidebar() {
   const [items, setItems] = useState([]);
   const [cheatedAtSet, setCheatedAtSet] = useState(new Set());
+  const [mobileOpen, setMobileOpen] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -226,15 +254,14 @@ function SequenceSidebar() {
     return () => window.removeEventListener('collatz-update', handler);
   }, []);
 
-  // Auto-scroll to bottom whenever items change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [items]);
 
-  return (
-    <aside className="sequence-sidebar">
+  const content = (
+    <>
       <div className="sidebar-header">
         <div className="sidebar-title">Sequence</div>
         <div className="sidebar-count">{items.length} steps</div>
@@ -260,7 +287,56 @@ function SequenceSidebar() {
           );
         })}
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className="sequence-sidebar sequence-sidebar--desktop">
+        {content}
+      </aside>
+
+      {/* Mobile: floating toggle button + bottom sheet */}
+      <div className="sequence-mobile">
+        <button
+          className="sequence-mobile-toggle"
+          onClick={() => setMobileOpen(v => !v)}
+        >
+          {mobileOpen ? 'Hide Sequence' : `Sequence (${items.length})`}
+        </button>
+        {mobileOpen && (
+          <div className="sequence-mobile-sheet">
+            <div className="sequence-mobile-header">
+              <span className="sidebar-title">Sequence</span>
+              <span className="sidebar-count">{items.length} steps</span>
+              <button className="sequence-mobile-close" onClick={() => setMobileOpen(false)}>✕</button>
+            </div>
+            <div className="sidebar-scroll" ref={scrollRef}>
+              {items.map((n, i) => {
+                const isEvenNum = n % 2 === 0;
+                const prevN = items[i - 1];
+                const wasCheated = i > 0 && cheatedAtSet.has(prevN);
+                const isLast = i === items.length - 1;
+                const isRepeated = isLast && items.slice(0, i).includes(n);
+                return (
+                  <div
+                    key={i}
+                    className={`seq-item
+                      ${isRepeated ? 'seq-item--repeated' : ''}
+                      ${wasCheated ? 'seq-item--cheated' : (isEvenNum ? 'seq-item--even' : 'seq-item--odd')}
+                    `}
+                  >
+                    <span className="seq-item-index">{i + 1}</span>
+                    <span>{n.toLocaleString()}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
