@@ -2,13 +2,13 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey:            "AIzaSyD28C5mJkvV8tpmt75zUsGUU1B1WPN_pgk",
+  authDomain:        "collatzsurvivor-8d189.firebaseapp.com",
+  projectId:         "collatzsurvivor-8d189",
+  storageBucket:     "collatzsurvivor-8d189.firebasestorage.app",
+  messagingSenderId: "341383369964",
+  appId:             "1:341383369964:web:4d0a2679770c6da447c1c9",
+  measurementId:     "G-7C2X79BY4M"
 };
 
 const app = initializeApp(firebaseConfig);
