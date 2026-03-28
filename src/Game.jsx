@@ -34,6 +34,7 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
   const [cheats, setCheats] = useState(initialCheats);
   const [evenCount, setEvenCount] = useState(0);
   const [cheatedAt, setCheatedAt] = useState([]);
+  const [cheatedAtSteps, setCheatedAtSteps] = useState([]);
   const [gameOver, setGameOver] = useState(false);
   const [repeatedNumber, setRepeatedNumber] = useState(null);
   const [highScore, setHighScore] = useState(() => loadHighScore(selectedDate));
@@ -76,6 +77,8 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
       const newVisited = new Set([...prev, nextVal]);
       const prevCurrent = prev[prev.length - 1];
       const newCheatedAt = didCheat ? [...cheatedAt, prevCurrent] : cheatedAt;
+      // Track which step number each cheat was used at (1-indexed = prev.length)
+      const newCheatedAtSteps = didCheat ? [...cheatedAtSteps, prev.length] : cheatedAtSteps;
 
       let newEvenCount = evenCount;
       let newCheats = didCheat ? cheats - 1 : cheats;
@@ -94,6 +97,7 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
       setCheats(newCheats);
       setEvenCount(newEvenCount);
       setCheatedAt(newCheatedAt);
+      setCheatedAtSteps(newCheatedAtSteps);
       setVisited(newVisited);
       setJustRecharged(recharged);
       if (didCheat) setCheatAnimKey(k => k + 1);
@@ -198,7 +202,7 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
               </div>
               <button className="game-btn game-btn--normal" onClick={handleNormal}>
                 {isCurrentEven ? 'Divide by 2' : 'Continue'}
-                <kbd>Space</kbd>
+                <kbd className="kbd-desktop">Space</kbd>
               </button>
             </div>
 
@@ -223,7 +227,7 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
                 disabled={!canCheat}
               >
                 {cheats > 0 ? `Cheat (${cheats} left)` : 'No cheats left'}
-                {canCheat && <kbd>C</kbd>}
+                {canCheat && <kbd className="kbd-desktop">C</kbd>}
               </button>
             </div>
           </div>
@@ -278,11 +282,21 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
               {cheatedAt.length === 0 ? 'No cheats used — pure run!' : `You cheated at ${cheatedAt.length} number${cheatedAt.length > 1 ? 's' : ''}:`}
             </div>
             {cheatedAt.length > 0 && (
-              <div className="cheat-tags">
-                {cheatedAt.map((n, i) => (
-                  <span key={i} className="cheat-tag">{n.toLocaleString()}</span>
-                ))}
-              </div>
+              <>
+                <div className="cheat-tags">
+                  {cheatedAt.map((n, i) => (
+                    <span key={i} className="cheat-tag">{n.toLocaleString()}</span>
+                  ))}
+                </div>
+                <div className="gameover-cheats-label" style={{ marginTop: 6 }}>
+                  You cheated at step{cheatedAtSteps.length > 1 ? 's' : ''}:
+                </div>
+                <div className="cheat-tags">
+                  {cheatedAtSteps.map((s, i) => (
+                    <span key={i} className="cheat-tag">{s}</span>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 

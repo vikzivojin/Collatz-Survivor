@@ -460,6 +460,8 @@ kbd {
 }
 
 @media (max-width: 700px) {
+  .kbd-desktop { display: none; }
+}
   .game { gap: 14px; }
   .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .action-row { grid-template-columns: 1fr 1fr; gap: 8px; }
