@@ -303,13 +303,17 @@ function SequenceSidebar() {
           className="sequence-mobile-toggle"
           onClick={() => setMobileOpen(v => !v)}
         >
-          {mobileOpen ? 'Hide Sequence' : `Sequence (${items.length})`}
+          <span>{mobileOpen ? 'Hide' : 'Show'}</span>
+          <span>Sequence</span>
+          <span className="sequence-mobile-count">{items.length}</span>
         </button>
         {mobileOpen && (
           <div className="sequence-mobile-sheet">
             <div className="sequence-mobile-header">
-              <span className="sidebar-title">Sequence</span>
-              <span className="sidebar-count">{items.length} steps</span>
+              <div className="sequence-mobile-header-text">
+                <div className="sidebar-title">Sequence</div>
+                <div className="sidebar-count">{items.length} steps</div>
+              </div>
               <button className="sequence-mobile-close" onClick={() => setMobileOpen(false)}>✕</button>
             </div>
             <div className="sidebar-scroll" ref={scrollRef}>

@@ -290,7 +290,7 @@ export function ChartCanvas({ sequence, cheatedAt, animated = true, height = nul
 }
 
 // ── Full modal (game-over) ──────────────────────────────────────────────────
-export default function SequenceChart({ sequence, cheatedAt, onClose }) {
+export default function SequenceChart({ sequence, cheatedAt, title, onClose }) {
   const peakVal = Math.max(...sequence);
   const peakIdx = sequence.indexOf(peakVal);
 
@@ -299,6 +299,8 @@ export default function SequenceChart({ sequence, cheatedAt, onClose }) {
       <div className="chart-modal" onClick={e => e.stopPropagation()}>
         <div className="chart-header">
           <div className="chart-meta">
+            {title && <span className="chart-meta-title">{title}</span>}
+            {title && <span className="chart-meta-sep">·</span>}
             <span className="chart-meta-item">{sequence.length} steps</span>
             <span className="chart-meta-sep">·</span>
             <span className="chart-meta-item">Peak: <strong>{peakVal.toLocaleString()}</strong> at step {peakIdx + 1}</span>

@@ -5,6 +5,7 @@ import {
 } from './gameLogic';
 import SequenceChart, { ChartCanvas } from './SequenceChart';
 import ShareModal from './ShareModal';
+import { fetchGlobalData, submitScore, calcPercentile } from './firestore';
 import './Game.css';
 
 function getHighScoreKey(dateStr) {
@@ -46,6 +47,10 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
   const [showChart, setShowChart] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showLiveChart, setShowLiveChart] = useState(true);
+  const [showWorldChart, setShowWorldChart] = useState(false);
+  const [globalData, setGlobalData] = useState(null);
+  const [percentile, setPercentile] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const current = sequence[sequence.length - 1];
   const isCurrentEven = isEven(current);
@@ -66,6 +71,38 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
   useEffect(() => {
     emitUpdate([startingNumber], []);
   }, []);
+
+  // Fetch global data for this date on mount
+  useEffect(() => {
+    fetchGlobalData(selectedDate).then(data => {
+      if (data) setGlobalData(data);
+    });
+  }, [selectedDate]);
+
+  // When game ends, submit score and compute percentile
+  useEffect(() => {
+    if (!gameOver) return;
+
+    async function submit() {
+      setSubmitting(true);
+      await submitScore({
+        dateStr: selectedDate,
+        currentScore: sequence.length,
+        sequence,
+        cheatedAt,
+      });
+      // Re-fetch to get updated global data + compute percentile
+      const fresh = await fetchGlobalData(selectedDate);
+      if (fresh) {
+        setGlobalData(fresh);
+        const pct = calcPercentile(sequence.length, fresh.totalPlayers, fresh);
+        setPercentile(pct);
+      }
+      setSubmitting(false);
+    }
+
+    submit();
+  }, [gameOver]);
 
   const advanceTo = useCallback((nextVal, didCheat) => {
     // Trigger fade animation
@@ -255,7 +292,7 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
         <div className="gameover-card">
           {repeatedIsStart && (
             <div className="gameover-award">
-              🏅 Full Circle! You ended on the starting number!
+              Full Circle! You ended on the starting number!
             </div>
           )}
           <div className={`gameover-badge ${isNewHighScore ? 'gameover-badge--new' : ''}`}>
@@ -271,9 +308,28 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
             </div>
           )}
 
-          {highScore && !isNewHighScore && (
-            <div className="gameover-hs">
-              Date best: <strong>{highScore.score}</strong>
+          {/* Percentile — standalone, above world record box */}
+          {!submitting && percentile !== null && (
+            <div className="gameover-percentile">
+              {percentile === '< 1'
+                ? 'Less than 1% of players have obtained a greater high score than this run.'
+                : `${percentile}% of players have obtained a greater high score than this run.`
+              }
+            </div>
+          )}
+
+          {/* Global stats box */}
+          {(submitting || globalData) && (
+            <div className="gameover-global">
+              {submitting && (
+                <div className="gameover-global-loading">Calculating world rank...</div>
+              )}
+              {!submitting && globalData && (
+                <div className="gameover-global-row">
+                  <span className="gameover-global-label">World Record</span>
+                  <span className="gameover-global-val">{globalData.globalHighScore}</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -301,12 +357,19 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
           </div>
 
           <div className="gameover-actions">
-            <button className="game-btn game-btn--share" onClick={() => setShowShare(true)}>
-              🔗 Share Score
-            </button>
-            <button className="game-btn game-btn--chart" onClick={() => setShowChart(true)}>
-              📈 See Your Path
-            </button>
+            <div className="gameover-actions-top">
+              <button className="game-btn game-btn--share" onClick={() => setShowShare(true)}>
+                Share Score
+              </button>
+              <button className="game-btn game-btn--chart" onClick={() => setShowChart(true)}>
+                See Your Path
+              </button>
+              {globalData?.globalHighSequence?.length > 0 && (
+                <button className="game-btn game-btn--world" onClick={() => setShowWorldChart(true)}>
+                  World Record Path
+                </button>
+              )}
+            </div>
             <button className="game-btn game-btn--restart" onClick={onRestart}>
               Try Again
             </button>
@@ -319,6 +382,15 @@ export default function Game({ startingNumber, initialCheats, rechargeInterval, 
           sequence={sequence}
           cheatedAt={cheatedAt}
           onClose={() => setShowChart(false)}
+        />
+      )}
+
+      {showWorldChart && globalData?.globalHighSequence?.length > 0 && (
+        <SequenceChart
+          sequence={globalData.globalHighSequence}
+          cheatedAt={globalData.globalHighCheatedAt || []}
+          title={`World Record — ${globalData.globalHighScore} steps`}
+          onClose={() => setShowWorldChart(false)}
         />
       )}
 
