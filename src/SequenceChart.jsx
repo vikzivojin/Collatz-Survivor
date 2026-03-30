@@ -223,8 +223,27 @@ export function ChartCanvas({ sequence, cheatedAt, animated = true, height = nul
       setDone(true);
       return;
     }
-    const speed = sequence.length > 200 ? 6 : sequence.length > 80 ? 14 : 28;
-    const t = setTimeout(() => setVisibleCount(v => v + 1), speed);
+
+    const total = sequence.length;
+
+    // Skip animation entirely for very large sequences
+    if (total > 30000) {
+      setVisibleCount(total);
+      setDone(true);
+      return;
+    }
+
+    let batchSize, speed;
+    if      (total <= 200)  { batchSize = 1;  speed = 28; }
+    else if (total <= 500)  { batchSize = 1;  speed = 14; }
+    else if (total <= 1000) { batchSize = 2;  speed = 14; }
+    else if (total <= 2000) { batchSize = 4;  speed = 14; }
+    else if (total <= 10000){ batchSize = 12; speed = 14; }
+    else                    { batchSize = 50; speed = 14; }
+
+    const t = setTimeout(() => {
+      setVisibleCount(v => Math.min(v + batchSize, total));
+    }, speed);
     return () => clearTimeout(t);
   }, [visibleCount, sequence.length, animated]);
 
