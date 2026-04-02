@@ -7,7 +7,7 @@ export default function PrivacyPage({ onBack }) {
         <button className="info-back" onClick={onBack}>Back</button>
 
         <h1 className="info-title">Privacy Policy</h1>
-        <p className="info-date">Last updated: March 2026</p>
+        <p className="info-date">Last updated: April 2026</p>
 
         <div className="info-body">
           <p>
@@ -18,7 +18,15 @@ export default function PrivacyPage({ onBack }) {
 
           <h3>Local Storage</h3>
           <p>
-            Collatz Survivor stores your game statistics — including daily high scores and the number of cheats used — directly in your browser's local storage. This data never leaves your device and is not transmitted to any server. You can clear this data at any time by clearing your browser's local storage or site data.
+            Collatz Survivor stores certain game data — including your daily high scores, cheat usage, and personal best scores — directly in your browser's local storage. This data is used to track your progress across sessions on the same device. You can clear this data at any time by clearing your browser's local storage or site data.
+          </p>
+
+          <h3>Global Scores and Firebase</h3>
+          <p>
+            When you complete a game, your score is submitted to our global leaderboard, which is powered by Google Firebase Firestore. This includes your score and the sequence of numbers you reached. This data is stored on Google's servers and is used solely to calculate global rankings, world records, and player percentiles. No personally identifiable information such as your name, email address, or IP address is collected or stored alongside your score.
+          </p>
+          <p>
+            For more information on how Google collects and processes data through Firebase, please review Google's Privacy Policy at <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.
           </p>
 
           <h3>Analytics</h3>
@@ -34,12 +42,12 @@ export default function PrivacyPage({ onBack }) {
 
           <h2>Cookies</h2>
           <p>
-            We do not set any first-party cookies. Google Analytics may set third-party cookies as described above.
+            We do not set any first-party cookies. Google Analytics and Firebase may set third-party cookies as described above.
           </p>
 
           <h2>Data Sharing</h2>
           <p>
-            We do not sell, trade, or otherwise transfer your information to third parties, except as described in the Google Analytics section above.
+            We do not sell, trade, or otherwise transfer your information to third parties, except as described in the Google Analytics and Firebase sections above.
           </p>
 
           <h2>Children's Privacy</h2>
